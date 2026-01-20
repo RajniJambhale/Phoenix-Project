@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,24 +17,28 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    //get all user
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUser() {
         List<User> user = userService.getAllUser();
         return ResponseEntity.ok(user);
     }
 
+     // get user by id
     @GetMapping("/get/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id")Integer id){
         User user = userService.getUserById(id);
         return ResponseEntity.ok().body(user);
     }
 
+    // create new user
     @PostMapping
     public List<User> createUser(@Valid @RequestBody List<@Valid User> users)
     {
         return userService.createUser(users);
     }
 
+    // get user by email
     @GetMapping("/email")
     public ResponseEntity<List<User>> getUserByEmail(@RequestParam String email) {
 
@@ -47,6 +50,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    // update user by using id
     @PutMapping("user/{id}")
     public ResponseEntity<Map<String, Object>> updateUser(
             @PathVariable Integer id,
@@ -63,6 +67,7 @@ public class UserController {
     }
 
 
+    //delete post by using id
     @DeleteMapping("user/{id}")
     public ResponseEntity<Map<String, String>> deleteUser(@PathVariable int id) {
         userService.deleteUserById(id);
