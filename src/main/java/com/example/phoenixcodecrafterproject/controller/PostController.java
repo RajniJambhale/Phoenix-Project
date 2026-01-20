@@ -3,10 +3,10 @@ import com.example.phoenixcodecrafterproject.model.Post;
 import com.example.phoenixcodecrafterproject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,13 +107,13 @@ public class PostController {
         return postService.postsLast7Days();
     }
 
-    //  Pagination
-    // GET /post?page=0&size=5
-    @GetMapping("/pages")
-    public Page<Post> getAllPosts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        return postService.getAllPosts(page, size);
+    //Pagination + sorting
+    //post/post?page=0&size=5
+    //post?sort=title,asc
+    @GetMapping("/post")
+    public Page<Post> getAllPosts(Pageable pageable) {
+        return postService.getAllPosts(pageable);
     }
+
 }
 
