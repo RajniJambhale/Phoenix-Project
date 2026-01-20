@@ -29,7 +29,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getAllPosts() {
-        List<Post> posts  = postRepository.findAll();
+        List<Post> posts = postRepository.findAll();
         if (posts.isEmpty()) {
             throw new PostNotFoundException("No posts found");
         }
@@ -89,9 +89,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<Post> getAllPosts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+    public Page<Post> getAllPosts(Pageable pageable) {
         return postRepository.findAll(pageable);
     }
 }
-
