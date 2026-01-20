@@ -1,4 +1,5 @@
 package com.example.phoenixcodecrafterproject.controller;
+import com.example.phoenixcodecrafterproject.dto.request.UserRegistrationDTO;
 import com.example.phoenixcodecrafterproject.exception.UserNotFoundException;
 import com.example.phoenixcodecrafterproject.model.User;
 import com.example.phoenixcodecrafterproject.service.UserService;
@@ -17,6 +18,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    // create new user
+    @PostMapping("/user")
+    public List<User> createUser(@Valid @RequestBody List<@Valid User> users)
+    {
+        return userService.createUser(users);
+    }
+
     //get all user
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUser() {
@@ -31,12 +39,6 @@ public class UserController {
         return ResponseEntity.ok().body(user);
     }
 
-    // create new user
-    @PostMapping
-    public List<User> createUser(@Valid @RequestBody List<@Valid User> users)
-    {
-        return userService.createUser(users);
-    }
 
     // get user by email
     @GetMapping("/email")
@@ -78,7 +80,12 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(
+            @Valid @RequestBody UserRegistrationDTO dto) {
 
+        return ResponseEntity.ok("User registered successfully");
+    }
 
 }
 
