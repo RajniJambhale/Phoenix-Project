@@ -22,14 +22,12 @@ public class PostController {
     // create post
     @PostMapping
     public ResponseEntity<Map<String, Object>> createPost(@Valid @RequestBody Post post) {
-
         Post savedPost = postService.createPost(post);
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
         response.put("message", "Post created successfully");
         response.put("data", savedPost);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -55,11 +53,9 @@ public class PostController {
             @RequestBody Post post) {
 
         Post updatedPost = postService.updatePost(id, post);
-
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Post updated successfully with id " + id);
         response.put("post", updatedPost);
-
         return ResponseEntity.ok(response);
     }
 
@@ -77,20 +73,15 @@ public class PostController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<Map<String, Object>> getPostsByUser(
             @PathVariable Long userId) {
-
         List<Post> userPosts = postService.getPostsByUser(userId);
-
         Map<String, Object> response = new HashMap<>();
-
         if (userPosts.isEmpty()) {
             response.put("message", "Given user has not created any post yet");
             response.put("posts", userPosts);
             return ResponseEntity.ok(response);
         }
-
         response.put("message", "Posts fetched successfully");
         response.put("posts", userPosts);
-
         return ResponseEntity.ok(response);
     }
 

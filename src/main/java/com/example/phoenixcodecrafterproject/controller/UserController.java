@@ -1,6 +1,5 @@
 package com.example.phoenixcodecrafterproject.controller;
 import com.example.phoenixcodecrafterproject.dto.request.UserRegistrationDTO;
-import com.example.phoenixcodecrafterproject.exception.UserNotFoundException;
 import com.example.phoenixcodecrafterproject.model.User;
 import com.example.phoenixcodecrafterproject.service.UserService;
 import jakarta.validation.Valid;
@@ -20,10 +19,8 @@ public class UserController {
 
     // create new user
     @PostMapping("/user")
-    public List<User> createUser(@Valid @RequestBody List<@Valid User> users)
-    {
-        return userService.createUser(users);
-    }
+    public User createUser(@Valid @RequestBody  User users)
+    {return userService.createUser(users);}
 
     //get all user
     @GetMapping("/users")
@@ -43,12 +40,7 @@ public class UserController {
     // get user by email
     @GetMapping("/email")
     public ResponseEntity<List<User>> getUserByEmail(@RequestParam String email) {
-
         List<User> users = userService.getUserByEmail(email);
-
-        if (users.isEmpty()) {
-            throw new UserNotFoundException("User not found with email: " + email);
-        }
         return ResponseEntity.ok(users);
     }
 
@@ -59,12 +51,10 @@ public class UserController {
             @RequestBody User userDetails) {
 
         User updatedUser = userService.updateUserById(id, userDetails);
-
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
         response.put("message", "User updated successfully with id: " + id);
         response.put("user", updatedUser);
-
         return ResponseEntity.ok(response);
     }
 
@@ -76,14 +66,12 @@ public class UserController {
         Map<String, String> response = new HashMap<>();
         response.put("status", "success");
         response.put("message", "User deleted successfully with id: " + id);
-
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(
             @Valid @RequestBody UserRegistrationDTO dto) {
-
         return ResponseEntity.ok("User registered successfully");
     }
 

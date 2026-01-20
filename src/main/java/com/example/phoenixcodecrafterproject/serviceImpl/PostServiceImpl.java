@@ -1,15 +1,13 @@
 package com.example.phoenixcodecrafterproject.serviceImpl;
-import com.example.phoenixcodecrafterproject.exception.PostNotFoundException;
+import com.example.phoenixcodecrafterproject.exception.BadRequestException;
+import com.example.phoenixcodecrafterproject.exception.ResourceNotFoundException;
 import com.example.phoenixcodecrafterproject.model.Post;
 import com.example.phoenixcodecrafterproject.repository.PostRepository;
 import com.example.phoenixcodecrafterproject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class PostServiceImpl implements PostService {
     public List<Post> getAllPosts() {
         List<Post> posts = postRepository.findAll();
         if (posts.isEmpty()) {
-            throw new PostNotFoundException("No posts found");
+            throw new ResourceNotFoundException("No posts found");
         }
         return posts;
     }
@@ -40,7 +38,7 @@ public class PostServiceImpl implements PostService {
     public Post getPostById(long id) {
         return postRepository.findById(id)
                 .orElseThrow(() ->
-                        new PostNotFoundException("Post not found with id: " + id));
+                        new ResourceNotFoundException("Post not found with id: " + id));
     }
 
 
@@ -48,7 +46,7 @@ public class PostServiceImpl implements PostService {
     public Post updatePost(long id, Post post) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() ->
-                        new PostNotFoundException("Post not found with id: " + id));
+                        new ResourceNotFoundException("Post not found with id: " + id));
         // Update non-null fields
         if (post.getTitle() != null) {
             existingPost.setTitle(post.getTitle());
@@ -57,10 +55,7 @@ public class PostServiceImpl implements PostService {
         if (post.getContent() != null) {
             existingPost.setContent(post.getContent());
         }
-
-
         existingPost.setUpdatedDate(LocalDateTime.now());
-
         return postRepository.save(existingPost);
     }
 
@@ -68,7 +63,7 @@ public class PostServiceImpl implements PostService {
     public void deletePost(long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() ->
-                        new PostNotFoundException("Post not found with id: " + id));
+                        new ResourceNotFoundException("Post not found with id: " + id));
         postRepository.delete(post);
     }
 
@@ -90,6 +85,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<Post> getAllPosts(Pageable pageable) {
+        if (pageable.getPageNumber() < 0) {
+            throw new BadRequestException("Page number cannot be negative");
+        }
         return postRepository.findAll(pageable);
     }
+
 }
