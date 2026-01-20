@@ -1,6 +1,7 @@
 package com.example.phoenixcodecrafterproject.controller;
 import com.example.phoenixcodecrafterproject.model.Post;
 import com.example.phoenixcodecrafterproject.service.PostService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +21,7 @@ public class PostController {
 
     // create post
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createPost(@RequestBody Post post) {
+    public ResponseEntity<Map<String, Object>> createPost(@Valid @RequestBody Post post) {
 
         Post savedPost = postService.createPost(post);
 
