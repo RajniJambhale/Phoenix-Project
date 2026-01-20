@@ -4,6 +4,10 @@ import com.example.phoenixcodecrafterproject.model.Post;
 import com.example.phoenixcodecrafterproject.repository.PostRepository;
 import com.example.phoenixcodecrafterproject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -66,6 +70,28 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() ->
                         new PostNotFoundException("Post not found with id: " + id));
         postRepository.delete(post);
+    }
+
+    @Override
+    public List<Post> getPostsByUser(Long userId) {
+        return postRepository.findPostsByUserId(userId);
+    }
+
+    @Override
+    public List<Post> searchPosts(String keyword) {
+        return postRepository.searchByKeyword(keyword);
+    }
+
+    @Override
+    public List<Post> postsLast7Days() {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        return postRepository.findPostsCreatedAfter(sevenDaysAgo);
+    }
+
+    @Override
+    public Page<Post> getAllPosts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        return postRepository.findAll(pageable);
     }
 }
 
