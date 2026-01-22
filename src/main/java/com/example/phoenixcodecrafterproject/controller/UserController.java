@@ -1,14 +1,15 @@
 package com.example.phoenixcodecrafterproject.controller;
+import com.example.phoenixcodecrafterproject.dto.request.CreateUserRequest;
+import com.example.phoenixcodecrafterproject.dto.request.UpdateUserRequest;
 import com.example.phoenixcodecrafterproject.dto.request.UserRegistrationDTO;
-import com.example.phoenixcodecrafterproject.model.User;
+import com.example.phoenixcodecrafterproject.dto.response.ApiResponse;
+import com.example.phoenixcodecrafterproject.dto.response.UserDTO;
 import com.example.phoenixcodecrafterproject.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -19,53 +20,41 @@ public class UserController {
 
     // create new user
     @PostMapping("/user")
-    public User createUser(@Valid @RequestBody  User users)
-    {return userService.createUser(users);}
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserRequest request) {
+        return ResponseEntity.ok(userService.createUser(request));
+    }
 
     //get all user
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUser() {
-        List<User> user = userService.getAllUser();
-        return ResponseEntity.ok(user);
+    public ResponseEntity<List<UserDTO>> getAllUser() {
+        return ResponseEntity.ok(userService.getAllUser());
     }
 
      // get user by id
-    @GetMapping("/get/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id")Integer id){
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok().body(user);
+    @GetMapping("/user/{id}/get")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable("id")Integer id){
+        return ResponseEntity.ok(userService.getUserById(id));
     }
-
 
     // get user by email
     @GetMapping("/email")
-    public ResponseEntity<List<User>> getUserByEmail(@RequestParam String email) {
-        List<User> users = userService.getUserByEmail(email);
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserDTO>> getUserByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     // update user by using id
     @PutMapping("user/{id}")
-    public ResponseEntity<Map<String, Object>> updateUser(
-            @PathVariable Integer id,
-            @RequestBody User userDetails) {
-
-        User updatedUser = userService.updateUserById(id, userDetails);
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "User updated successfully with id: " + id);
-        response.put("user", updatedUser);
+    public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable int id, @RequestBody UpdateUserRequest request) {
+        UserDTO updatedUser = userService.updateUserById(id, request);
+        ApiResponse<UserDTO> response = new ApiResponse<>("success", "User updated successfully with id: " + id, updatedUser);
         return ResponseEntity.ok(response);
     }
 
-
-    //delete post by using id
-    @DeleteMapping("user/{id}")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable int id) {
+    //delete user & post by using user id
+    @DeleteMapping("user/{id}/post")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable int id) {
         userService.deleteUserById(id);
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "User deleted successfully with id: " + id);
+        ApiResponse<Void> response = new ApiResponse<>("success", "User deleted successfully with id: " + id, null);
         return ResponseEntity.ok(response);
     }
 
