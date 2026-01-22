@@ -1,5 +1,5 @@
 package com.example.phoenixcodecrafterproject.exception;
-import com.example.phoenixcodecrafterproject.dto.request.ErrorResponse;
+import com.example.phoenixcodecrafterproject.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
