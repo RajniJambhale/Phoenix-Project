@@ -1,15 +1,15 @@
 package com.example.phoenixcodecrafterproject.service;
-
-import com.example.phoenixcodecrafterproject.model.User;
+import com.example.phoenixcodecrafterproject.dto.request.CreateUserRequest;
+import com.example.phoenixcodecrafterproject.dto.request.UpdateUserRequest;
+import com.example.phoenixcodecrafterproject.dto.response.UserDTO;
 import java.util.List;
 
 public interface UserService {
-    List<User> getAllUser();
-    User getUserById(int Id);
-    User createUser(User user);
-    List<User> getUserByEmail(String email);
-    User updateUserById(int id, User updateduser);
+    UserDTO createUser(CreateUserRequest request);
+    UserDTO getUserById(int id);
+    UserDTO updateUserById(int id, UpdateUserRequest request);
+    List<UserDTO> getAllUser();
+    List<UserDTO> getUserByEmail(String email);
     void deleteUserById(int id);
-
 
 }
