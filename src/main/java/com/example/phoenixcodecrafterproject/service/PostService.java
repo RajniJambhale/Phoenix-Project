@@ -1,27 +1,21 @@
 package com.example.phoenixcodecrafterproject.service;
-import com.example.phoenixcodecrafterproject.model.Post;
+import com.example.phoenixcodecrafterproject.dto.request.CreatePostRequest;
+import com.example.phoenixcodecrafterproject.dto.request.UpdatePostRequest;
+import com.example.phoenixcodecrafterproject.dto.response.PostDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface PostService {
-    Post createPost(Post post);
-
-    List<Post> getAllPosts();
-
-    Post getPostById(long id);
-
-    Post updatePost(long id, Post post);
-
+    PostDTO createPost(CreatePostRequest request);
+    List<PostDTO> getAllPost();
+    PostDTO getPostById(long id);
+    PostDTO updatePost(long id, UpdatePostRequest request);
     void deletePost(long id);
-
-    List<Post> getPostsByUser(Long userId);
-
-    List<Post> searchPosts(String keyword);
-
-    List<Post> postsLast7Days();
-
-    Page<Post> getAllPosts(Pageable pageable);
+    List<PostDTO> getPostsByUser(Long userId);
+    List<PostDTO> searchPosts(String keyword);
+    List<PostDTO> postsLast7Days();
+    Page<PostDTO> getAllPosts(Pageable pageable);
 
 }
