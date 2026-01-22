@@ -1,12 +1,19 @@
 package com.example.phoenixcodecrafterproject.serviceImpl;
+import com.example.phoenixcodecrafterproject.dto.request.CreatePostRequest;
+import com.example.phoenixcodecrafterproject.dto.request.UpdatePostRequest;
+import com.example.phoenixcodecrafterproject.dto.response.PostDTO;
 import com.example.phoenixcodecrafterproject.exception.BadRequestException;
 import com.example.phoenixcodecrafterproject.exception.ResourceNotFoundException;
+import com.example.phoenixcodecrafterproject.mapper.PostMapper;
 import com.example.phoenixcodecrafterproject.model.Post;
+import com.example.phoenixcodecrafterproject.model.User;
 import com.example.phoenixcodecrafterproject.repository.PostRepository;
+import com.example.phoenixcodecrafterproject.repository.UserRepository;
 import com.example.phoenixcodecrafterproject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,45 +25,43 @@ public class PostServiceImpl implements PostService {
     @Autowired
     PostRepository postRepository;
 
-    @Override
-    public Post createPost(Post post) {
-        Post posts = postRepository.save(post);
-        return posts;
+    @Autowired
+    UserRepository userRepository;
 
+    @Transactional
+    @Override
+    public PostDTO createPost(CreatePostRequest request) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return PostMapper.toPostDTO(
+                postRepository.save(PostMapper.toEntity(request, user)));
     }
 
     @Override
-    public List<Post> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        if (posts.isEmpty()) {
-            throw new ResourceNotFoundException("No posts found");
-        }
-        return posts;
+    public List<PostDTO> getAllPost() {
+            List<Post> posts = postRepository.findAll();
+            return posts.stream()
+                    .map(PostMapper::toPostDTO)
+                    .toList();
     }
 
     @Override
-    public Post getPostById(long id) {
-        return postRepository.findById(id)
+    public PostDTO getPostById(long id) {
+        Post post = postRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Post not found with id: " + id));
+        return PostMapper.toPostDTO(post);
     }
 
 
     @Override
-    public Post updatePost(long id, Post post) {
+    public PostDTO updatePost(long id, UpdatePostRequest request) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Post not found with id: " + id));
-        // Update non-null fields
-        if (post.getTitle() != null) {
-            existingPost.setTitle(post.getTitle());
-        }
-
-        if (post.getContent() != null) {
-            existingPost.setContent(post.getContent());
-        }
-        existingPost.setUpdatedDate(LocalDateTime.now());
-        return postRepository.save(existingPost);
+        PostMapper.updateEntity(existingPost, request);
+        Post updatedPost = postRepository.save(existingPost);
+        return PostMapper.toPostDTO(updatedPost);
     }
 
     @Override
@@ -68,27 +73,36 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPostsByUser(Long userId) {
-        return postRepository.findPostsByUserId(userId);
+    public List<PostDTO> getPostsByUser(Long userId) {
+        List<Post> posts = postRepository.findPostsByUserId(userId);
+        return posts.stream()
+                .map(PostMapper::toPostDTO)
+                .toList();
     }
 
     @Override
-    public List<Post> searchPosts(String keyword) {
-        return postRepository.searchByKeyword(keyword);
+    public List<PostDTO> searchPosts(String keyword) {
+        List<Post> posts = postRepository.searchByKeyword(keyword);
+        return posts.stream()
+                .map(PostMapper::toPostDTO)
+                .toList();
     }
 
     @Override
-    public List<Post> postsLast7Days() {
+    public List<PostDTO> postsLast7Days() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-        return postRepository.findPostsCreatedAfter(sevenDaysAgo);
+        List<Post> posts =  postRepository.findPostsCreatedAfter(sevenDaysAgo);
+        return posts.stream()
+                .map(PostMapper::toPostDTO)
+                .toList();
     }
 
     @Override
-    public Page<Post> getAllPosts(Pageable pageable) {
+    public Page<PostDTO> getAllPosts(Pageable pageable) {
         if (pageable.getPageNumber() < 0) {
-            throw new BadRequestException("Page number cannot be negative");
-        }
-        return postRepository.findAll(pageable);
+            throw new BadRequestException("Page number cannot found");}
+        return postRepository.findAll(pageable)
+                .map(PostMapper::toPostDTO);
     }
 
 }
