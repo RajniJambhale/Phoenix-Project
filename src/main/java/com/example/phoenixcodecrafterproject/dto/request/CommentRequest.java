@@ -1,4 +1,4 @@
-package com.example.phoenixcodecrafterproject.model;
+package com.example.phoenixcodecrafterproject.dto.request;
 
 import lombok.Data;
 
