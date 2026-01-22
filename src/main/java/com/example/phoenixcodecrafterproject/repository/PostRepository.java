@@ -27,4 +27,8 @@ public interface PostRepository extends JpaRepository<Post, Serializable> {
     @Query("SELECT p FROM Post p WHERE p.createdDate >= :date")
     List<Post> findPostsCreatedAfter(@Param("date") LocalDateTime date);
 
+    @Query("SELECT p FROM Post p JOIN FETCH p.user")
+    List<Post> findAllWithUser();
+
+
 }
