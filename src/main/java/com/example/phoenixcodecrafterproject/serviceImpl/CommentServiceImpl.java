@@ -26,7 +26,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment addComment(Long postId, Long userId, String content) {
-
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
@@ -37,7 +36,6 @@ public class CommentServiceImpl implements CommentService {
         comment.setContent(content);
         comment.setPost(post);
         comment.setUser(user);
-
         return commentRepository.save(comment);
     }
 }
