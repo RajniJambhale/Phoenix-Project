@@ -1,4 +1,4 @@
-package com.example.phoenixcodecrafterproject.dto.request;
+package com.example.phoenixcodecrafterproject.dto.response;
 import lombok.*;
 import java.time.LocalDateTime;
 
