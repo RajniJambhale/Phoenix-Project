@@ -1,79 +1,71 @@
 package com.example.phoenixcodecrafterproject.serviceImpl;
+import com.example.phoenixcodecrafterproject.dto.request.CreateUserRequest;
+import com.example.phoenixcodecrafterproject.dto.request.UpdateUserRequest;
+import com.example.phoenixcodecrafterproject.dto.response.UserDTO;
 import com.example.phoenixcodecrafterproject.exception.DuplicateResourceException;
 import com.example.phoenixcodecrafterproject.exception.ResourceNotFoundException;
+import com.example.phoenixcodecrafterproject.mapper.UserMapper;
 import com.example.phoenixcodecrafterproject.model.User;
 import com.example.phoenixcodecrafterproject.repository.UserRepository;
 import com.example.phoenixcodecrafterproject.service.UserService;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public List<User> getAllUser() {
-        List<User> user  = userRepository.findAll();
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException("No user found");
-        }
-        return user;
+    @Transactional(readOnly = true)
+    public List<UserDTO> getAllUser() {
+        List<User> users  = userRepository.findAll();
+        if (users.isEmpty()) {throw new ResourceNotFoundException("No user found");}
+        return users.stream().map(UserMapper::toUserDTO).toList();
     }
 
     @Override
-    public User getUserById(int Id) {
-        return userRepository.findById(Id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id: " + Id));
-
+    @Transactional(readOnly = true)
+    public UserDTO getUserById(int Id) {
+        User user =  userRepository.findById(Id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + Id));
+        return UserMapper.toUserDTO(user);
     }
 
     @Override
-    public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new DuplicateResourceException("Email already exists");
-        }
-        return userRepository.save(user);
+    public UserDTO createUser(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {throw new DuplicateResourceException("User already exists with email: " + request.getEmail());}
+        User user = UserMapper.toEntity(request);
+        User savedUser = userRepository.save(user);
+        return UserMapper.toUserDTO(savedUser);
     }
 
 
     @Override
-    public List<User> getUserByEmail(String email) {
+    @Transactional(readOnly = true)
+    public List<UserDTO> getUserByEmail(String email) {
         List<User> users = userRepository.findByEmail(email);
-        if (users.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "User not found with email: " + email
-            );
-        }
-        return users;
+        if (users.isEmpty()) {throw new ResourceNotFoundException("User not found with email: " + email);}
+        return users.stream().map(UserMapper::toUserDTO).toList();
     }
 
     @Override
-    public User updateUserById(int id, User updateduser) {
-        // Find existing user
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id: " + id));
-
-        // Update fields
-        existingUser.setUsername(updateduser.getUsername());
-        existingUser.setEmail(updateduser.getEmail());
-
-        // Save updated user
-        return userRepository.save(existingUser);
+    public UserDTO updateUserById(int id, UpdateUserRequest request) {
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        UserMapper.updateEntity(existingUser, request);
+        User updatedUser = userRepository.save(existingUser);
+        return UserMapper.toUserDTO(updatedUser);
     }
 
     @Override
     public void deleteUserById(int id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id: " + id));
-
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepository.delete(user);
     }
-
 }
