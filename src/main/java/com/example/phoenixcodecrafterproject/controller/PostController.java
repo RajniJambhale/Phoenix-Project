@@ -1,5 +1,8 @@
 package com.example.phoenixcodecrafterproject.controller;
-import com.example.phoenixcodecrafterproject.model.Post;
+import com.example.phoenixcodecrafterproject.dto.request.CreatePostRequest;
+import com.example.phoenixcodecrafterproject.dto.request.UpdatePostRequest;
+import com.example.phoenixcodecrafterproject.dto.response.ApiResponse;
+import com.example.phoenixcodecrafterproject.dto.response.PostDTO;
 import com.example.phoenixcodecrafterproject.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/post")
@@ -20,90 +22,64 @@ public class PostController {
     PostService postService;
 
     // create post
-    @PostMapping
-    public ResponseEntity<Map<String, Object>> createPost(@Valid @RequestBody Post post) {
-        Post savedPost = postService.createPost(post);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Post created successfully");
-        response.put("data", savedPost);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<PostDTO>> createPost(@Valid @RequestBody CreatePostRequest request) {
+        PostDTO savedPost = postService.createPost(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ApiResponse<>("success", "Post created successfully", savedPost));
     }
 
     // get  all post
-    @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts() {
-        List<Post> posts = postService.getAllPosts();
-        return ResponseEntity.ok(posts);
+    @GetMapping("/get")
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPost());
     }
 
 
     // get post by id
-    @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
-        Post post = postService.getPostById(id);
-        return ResponseEntity.ok(post);
+    @GetMapping("/get/{id}")
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getPostById(id));
     }
 
     // update post
-    @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> updatePost(
-            @PathVariable Long id,
-            @RequestBody Post post) {
-
-        Post updatedPost = postService.updatePost(id, post);
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Post updated successfully with id " + id);
-        response.put("post", updatedPost);
-        return ResponseEntity.ok(response);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ApiResponse<PostDTO>> updatePost(@PathVariable Long id, @RequestBody UpdatePostRequest post) {
+        PostDTO updatedPost = postService.updatePost(id, post);
+        return ResponseEntity.ok(
+                new ApiResponse<>("success", "Post updated successfully with id " + id, updatedPost));
     }
 
     // delete post
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> deletePost(@PathVariable Long id){
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long id){
         postService.deletePost(id);
-
-        Map<String,Object> response =  new HashMap<>();
-        response.put("message", "Post deleted successfully with Id " + id);
+        ApiResponse<Void> response = new ApiResponse<>("success", "Post deleted successfully with Id " + id, null);
         return ResponseEntity.ok(response);
     }
 
     // Find posts by user
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Map<String, Object>> getPostsByUser(
-            @PathVariable Long userId) {
-        List<Post> userPosts = postService.getPostsByUser(userId);
-        Map<String, Object> response = new HashMap<>();
-        if (userPosts.isEmpty()) {
-            response.put("message", "Given user has not created any post yet");
-            response.put("posts", userPosts);
-            return ResponseEntity.ok(response);
-        }
-        response.put("message", "Posts fetched successfully");
-        response.put("posts", userPosts);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<PostDTO>> getPostsByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(postService.getPostsByUser(userId));
     }
 
-
-    //  Search posts by keyword
-    // GET /post/search?keyword=spring
+    //  Search posts by keyword /post/search?keyword=spring
     @GetMapping("/search")
-    public List<Post> searchPosts(@RequestParam String keyword) {
+    public List<PostDTO> searchPosts(@RequestParam String keyword) {
         return postService.searchPosts(keyword);
     }
 
     //  Posts from last 7 days
     @GetMapping("/recent")
-    public List<Post> recentPosts() {
+    public List<PostDTO> recentPosts() {
         return postService.postsLast7Days();
     }
 
     //Pagination + sorting
-    //post/post?page=0&size=5
-    //post?sort=title,asc
-    @GetMapping("/post")
-    public Page<Post> getAllPosts(Pageable pageable) {
+    @GetMapping("/pages")
+    public Page<PostDTO> getAllPosts(Pageable pageable) {
         return postService.getAllPosts(pageable);
     }
 
