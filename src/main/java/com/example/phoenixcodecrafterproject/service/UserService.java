@@ -9,7 +9,7 @@ public interface UserService {
     UserDTO getUserById(int id);
     UserDTO updateUserById(int id, UpdateUserRequest request);
     List<UserDTO> getAllUser();
-    List<UserDTO> getUserByEmail(String email);
+    UserDTO getUserByEmail(String email);
     void deleteUserById(int id);
 
 }
