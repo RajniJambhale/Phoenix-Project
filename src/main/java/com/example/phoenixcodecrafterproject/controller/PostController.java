@@ -15,7 +15,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/api")
 public class PostController {
 
     @Autowired
@@ -31,7 +31,7 @@ public class PostController {
     }
 
     // get  all post
-    @GetMapping("/get")
+    @GetMapping("/posts")
     public ResponseEntity<List<PostDTO>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPost());
     }
