@@ -1,7 +1,6 @@
 package com.example.phoenixcodecrafterproject.controller;
 import com.example.phoenixcodecrafterproject.dto.request.CreateUserRequest;
 import com.example.phoenixcodecrafterproject.dto.request.UpdateUserRequest;
-import com.example.phoenixcodecrafterproject.dto.request.UserRegistrationDTO;
 import com.example.phoenixcodecrafterproject.dto.response.ApiResponse;
 import com.example.phoenixcodecrafterproject.dto.response.UserDTO;
 import com.example.phoenixcodecrafterproject.service.UserService;
@@ -38,7 +37,7 @@ public class UserController {
 
     // get user by email
     @GetMapping("/email")
-    public ResponseEntity<List<UserDTO>> getUserByEmail(@RequestParam String email) {
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
@@ -56,12 +55,6 @@ public class UserController {
         userService.deleteUserById(id);
         ApiResponse<Void> response = new ApiResponse<>("success", "User deleted successfully with id: " + id, null);
         return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(
-            @Valid @RequestBody UserRegistrationDTO dto) {
-        return ResponseEntity.ok("User registered successfully");
     }
 
 }
