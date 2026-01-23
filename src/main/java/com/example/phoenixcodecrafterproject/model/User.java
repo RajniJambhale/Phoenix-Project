@@ -26,6 +26,12 @@ public class User {
         @NotBlank(message = "Email should not blank")
         private String email;
 
+        @Column(nullable = false)
+        private String password;
+
+        @Column(nullable = false)
+        private String role;
+
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
         @JsonManagedReference("user-post")
         private List<Post> posts = new ArrayList<>();
