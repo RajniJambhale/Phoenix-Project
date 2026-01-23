@@ -61,7 +61,7 @@ import java.util.Map;
 
             ErrorResponse error = new ErrorResponse(
                     LocalDateTime.now(),
-                    HttpStatus.NOT_FOUND.value(),   // 400
+                    HttpStatus.NOT_FOUND.value(),
                     ex.getMessage(),
                     "Resource not found"
             );
@@ -75,7 +75,7 @@ import java.util.Map;
 
             ErrorResponse error = new ErrorResponse(
                     LocalDateTime.now(),
-                    HttpStatus.BAD_REQUEST.value(),   // 400
+                    HttpStatus.BAD_REQUEST.value(),
                     ex.getMessage(),
                     "Bad request"
             );
@@ -90,7 +90,7 @@ import java.util.Map;
 
             ErrorResponse error = new ErrorResponse(
                     LocalDateTime.now(),
-                    HttpStatus.CONFLICT.value(),   // 409
+                    HttpStatus.CONFLICT.value(),
                     ex.getMessage(),
                     "Duplicate resource"
             );
@@ -104,7 +104,7 @@ import java.util.Map;
 
             ErrorResponse error = new ErrorResponse(
                     LocalDateTime.now(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(), // 500
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     "Internal server error",
                     "Something went wrong"
             );
@@ -112,4 +112,17 @@ import java.util.Map;
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        @ExceptionHandler(EmailAlreadyExistsException.class)
+        public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(
+                EmailAlreadyExistsException ex) {
+
+            ErrorResponse error = new ErrorResponse(
+                    LocalDateTime.now(),
+                    HttpStatus.CONFLICT.value(),
+                    ex.getMessage(),
+                    "Email is already registered"
+            );
+
+            return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+        }
     }
