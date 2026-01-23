@@ -49,11 +49,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserDTO> getUserByEmail(String email) {
-        List<User> users = userRepository.findByEmail(email);
-        if (users.isEmpty()) {throw new ResourceNotFoundException("User not found with email: " + email);}
-        return users.stream().map(UserMapper::toUserDTO).toList();
+    public UserDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with email: " + email));
+        return UserDTO.builder()
+                .id(user.getId())
+                .name(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
     }
+
 
     @Override
     public UserDTO updateUserById(int id, UpdateUserRequest request) {
