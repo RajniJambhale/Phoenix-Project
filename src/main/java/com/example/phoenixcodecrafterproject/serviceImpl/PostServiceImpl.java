@@ -13,6 +13,8 @@ import com.example.phoenixcodecrafterproject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -59,6 +61,14 @@ public class PostServiceImpl implements PostService {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Post not found with id: " + id));
+        String loggedInEmail =
+                SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (!existingPost.getUser().getEmail().equals(loggedInEmail)) {
+            throw new AccessDeniedException("You can edit only your own post");
+        }
+        existingPost.setTitle(request.title());
+        existingPost.setContent(request.content());
         PostMapper.updateEntity(existingPost, request);
         Post updatedPost = postRepository.save(existingPost);
         return PostMapper.toPostDTO(updatedPost);
