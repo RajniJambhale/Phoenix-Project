@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jwtAuthEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/me").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/**").hasAnyRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
