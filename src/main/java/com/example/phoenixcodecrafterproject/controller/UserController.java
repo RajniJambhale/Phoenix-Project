@@ -7,6 +7,7 @@ import com.example.phoenixcodecrafterproject.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class UserController {
     }
 
     //get all user
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUser() {
         return ResponseEntity.ok(userService.getAllUser());
@@ -50,7 +52,8 @@ public class UserController {
     }
 
     //delete user & post by using user id
-    @DeleteMapping("user/{id}/post")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("user/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable int id) {
         userService.deleteUserById(id);
         ApiResponse<Void> response = new ApiResponse<>("success", "User deleted successfully with id: " + id, null);
