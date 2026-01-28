@@ -2,6 +2,7 @@ package com.example.phoenixcodecrafterproject.serviceImpl;
 
 import com.example.phoenixcodecrafterproject.dto.request.UserRegistrationDTO;
 import com.example.phoenixcodecrafterproject.exception.EmailAlreadyExistsException;
+import com.example.phoenixcodecrafterproject.model.Role;
 import com.example.phoenixcodecrafterproject.model.User;
 import com.example.phoenixcodecrafterproject.repository.UserRepository;
 import com.example.phoenixcodecrafterproject.service.RegisterService;
@@ -32,10 +33,9 @@ public class RegisterServiceImpl implements RegisterService {
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-
-        // 🔐 Hash password (NOW WORKS)
+        
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole("ROLE_USER");
+        user.setRole(Role.USER);
 
         userRepository.save(user);
     }
