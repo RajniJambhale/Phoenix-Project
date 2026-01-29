@@ -1,4 +1,5 @@
 package com.example.phoenixcodecrafterproject.serviceImpl;
+
 import com.example.phoenixcodecrafterproject.dto.request.CreatePostRequest;
 import com.example.phoenixcodecrafterproject.dto.request.UpdatePostRequest;
 import com.example.phoenixcodecrafterproject.dto.response.PostDTO;
@@ -13,10 +14,9 @@ import com.example.phoenixcodecrafterproject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -41,10 +41,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDTO> getAllPost() {
-            List<Post> posts = postRepository.findAll();
-            return posts.stream()
-                    .map(PostMapper::toPostDTO)
-                    .toList();
+        List<Post> posts = postRepository.findAll();
+        return posts.stream()
+                .map(PostMapper::toPostDTO)
+                .toList();
     }
 
     @Override
@@ -61,12 +61,6 @@ public class PostServiceImpl implements PostService {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Post not found with id: " + id));
-        String loggedInEmail =
-                SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (!existingPost.getUser().getEmail().equals(loggedInEmail)) {
-            throw new AccessDeniedException("You can edit only your own post");
-        }
         existingPost.setTitle(request.title());
         existingPost.setContent(request.content());
         PostMapper.updateEntity(existingPost, request);
@@ -101,7 +95,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDTO> postsLast7Days() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-        List<Post> posts =  postRepository.findPostsCreatedAfter(sevenDaysAgo);
+        List<Post> posts = postRepository.findPostsCreatedAfter(sevenDaysAgo);
         return posts.stream()
                 .map(PostMapper::toPostDTO)
                 .toList();
@@ -110,7 +104,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostDTO> getAllPosts(Pageable pageable) {
         if (pageable.getPageNumber() < 0) {
-            throw new BadRequestException("Page number cannot found");}
+            throw new BadRequestException("Page number cannot found");
+        }
         return postRepository.findAll(pageable)
                 .map(PostMapper::toPostDTO);
     }
